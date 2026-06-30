@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lifolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --text: #f0f0f0;
+      --muted: #666;
+      --accent: #c8f135;
+      --accent-dim: rgba(200,241,53,0.1);
+      --radius: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(36px, 7vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #a8a8a8;
+      max-width: 540px;
+      margin: 0 auto 36px;
+    }
+
+    /* ── About section ── */
+    .about-section {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .about-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      text-align: left;
+    }
+    .about-card .icon {
+      width: 32px; height: 32px;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .about-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .about-card p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    /* ── Coming soon ── */
+    .coming-soon {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px 70px;
+      text-align: center;
+    }
+    .coming-soon-card {
+      background: linear-gradient(135deg, var(--accent-dim), transparent);
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+    }
+    .coming-soon-card .label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .coming-soon-card p {
+      font-size: 14px;
+      color: #c0c0c0;
+      line-height: 1.6;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 50px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── Profile preview ── */
+    .preview-section {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 24px 100px;
+    }
+    .preview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      text-align: center;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .preview-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .preview-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--accent), #fff);
+      padding: 2.5px;
+    }
+    .preview-avatar img {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: var(--bg);
+    }
+    .preview-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .preview-username {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .preview-bio {
+      font-size: 13px;
+      color: #a8a8a8;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+    .preview-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #000;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 11px 24px;
+      border-radius: 24px;
+      transition: opacity 0.2s;
+    }
+    .preview-cta:hover { opacity: 0.85; }
+    .preview-cta svg { width: 14px; height: 14px; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 30px 24px 50px;
+      font-size: 12px;
+      color: #444;
+    }
+
+    @media (max-width: 600px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 70px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge"><span class="dot"></span> Building in public</div>
+    <h1>A quieter place<br>to be <span>found</span>.</h1>
+    <p>No feed. No algorithm. No endless scroll. Just one link that shows people who you actually are — your work, your moments, your story, built over time.</p>
+  </div>
+
+  <!-- About -->
+  <div class="about-section">
+    <div class="about-grid">
+      <div class="about-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <h3>Built over time</h3>
+        <p>Your profile grows with you — not with trends, not with pressure to post daily.</p>
+      </div>
+      <div class="about-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <h3>No distractions</h3>
+        <p>No notifications, no comments, no comparison. Just a clean space that's yours.</p>
+      </div>
+      <div class="about-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <h3>One link, everything</h3>
+        <p>Share one URL. People see your story, your work, your contact — all in one place.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coming soon -->
+  <div class="coming-soon">
+    <div class="coming-soon-card">
+      <div class="label">✦ Coming soon</div>
+      <p>A simple, distraction-free way for people to connect — built for real presence, not endless scrolling. More on this soon.</p>
+    </div>
+  </div>
+
+  <div class="divider"><span>Featured Profile</span></div>
+
+  <!-- Profile preview -->
+  <div class="preview-section">
+    <a href="/hamiz" class="preview-card" style="text-decoration:none; color: inherit; display:block;">
+      <div class="preview-avatar">
+        <img id="preview-avatar-img" src="https://ui-avatars.com/api/?name=Hamiz&background=1e1e1e&color=c8f135&size=160" alt="Hamiz" />
+      </div>
+      <div class="preview-name" id="preview-name">Hamiz</div>
+      <div class="preview-username" id="preview-username">@hamiz</div>
+      <div class="preview-bio" id="preview-bio">Tap to view the full profile.</div>
+      <span class="preview-cta">
+        View Profile
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+  </div>
+
+  <div class="footer">© 2026 Lifolio — a simpler way to be found.</div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL = "https://bteojuybqkeldofcqvda.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0ZW9qdXlicWtlbGRvZmNxdmRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NjQ0NDAsImV4cCI6MjA5ODM0MDQ0MH0.LNfWUbyA01gocxvvWogbkYIDYsdFQ5OMcEAjEd8SNMg";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadPreview() {
+      const { data } = await supabase.from('profile').select('*').limit(1).single();
+      if (!data) return;
+      if (data.name) document.getElementById('preview-name').textContent = data.name;
+      if (data.username) document.getElementById('preview-username').textContent = '@' + data.username;
+      if (data.bio) document.getElementById('preview-bio').textContent = data.bio;
+      if (data.avatar_url) document.getElementById('preview-avatar-img').src = data.avatar_url;
+    }
+    loadPreview();
+  </script>
+
+</body>
+</html>
