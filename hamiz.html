@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hamiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --text: #f0f0f0;
+      --muted: #666;
+      --accent: #c8f135;
+      --accent-dim: rgba(200,241,53,0.1);
+      --radius: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    a.back-link {
+      position: fixed;
+      top: 20px; left: 20px;
+      z-index: 60;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 20px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    a.back-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ───── ADMIN BAR ───── */
+    #admin-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    #admin-bar.visible { display: flex; }
+    .admin-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .admin-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.8; }
+    .btn-accent { background: var(--accent); color: #000; }
+    .btn-ghost { background: var(--border); color: var(--text); }
+    .btn-danger { background: #2a1010; color: #ff6b6b; }
+
+    /* ───── LOGIN MODAL ───── */
+    #login-modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #login-modal.visible { display: flex; }
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 360px;
+    }
+    .modal-card h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      margin-bottom: 24px;
+    }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; }
+    .field input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .field input:focus { border-color: var(--accent); }
+    #login-error { font-size: 12px; color: #ff6b6b; margin-bottom: 12px; min-height: 16px; }
+    .modal-footer { margin-top: 8px; display: flex; gap: 8px; }
+    .modal-footer .btn { flex: 1; padding: 11px; }
+
+    /* ───── MAIN PROFILE ───── */
+    .profile-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 90px 20px 80px;
+    }
+    #admin-bar.visible ~ .profile-wrap { padding-top: 110px; }
+
+    /* ── Header ── */
+    .profile-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 28px;
+      margin-bottom: 32px;
+    }
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .avatar-ring {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent) 0%, #fff 100%);
+      padding: 2.5px;
+    }
+    .avatar-img {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: var(--surface);
+    }
+    .avatar-edit-btn {
+      position: absolute;
+      bottom: 2px; right: 2px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    body.admin-mode .avatar-edit-btn { display: flex; }
+
+    .profile-info { flex: 1; padding-top: 4px; }
+    .display-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .username {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .bio {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #b0b0b0;
+      white-space: pre-wrap;
+    }
+
+    /* ── Links ── */
+    .links-section { margin: 20px 0 28px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .link-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .link-chip:hover { background: var(--accent-dim); border-color: var(--accent); }
+    .link-chip svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .stat {
+      flex: 1;
+      padding: 14px 10px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; }
+
+    /* ── Grid ── */
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px;
+    }
+    .grid-cell {
+      aspect-ratio: 1;
+      background: var(--surface);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+    .grid-cell img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .grid-cell:hover img { transform: scale(1.04); }
+    .grid-cell-add {
+      border: 1.5px dashed var(--border);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .grid-cell-add:hover { border-color: var(--accent); color: var(--accent); }
+    body.admin-mode .grid-cell-add { display: flex; }
+    .grid-cell-add svg { width: 22px; height: 22px; }
+
+    .grid-cell-del {
+      position: absolute; top: 5px; right: 5px;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #fff;
+      font-size: 13px;
+      border: none;
+    }
+    body.admin-mode .grid-cell-del { display: flex; }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+    }
+    #lightbox.visible { display: flex; }
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+    #lightbox-close {
+      position: absolute; top: 20px; right: 24px;
+      font-size: 28px; color: #fff; cursor: pointer;
+      background: none; border: none;
+      line-height: 1;
+    }
+
+    /* ── Edit panel ── */
+    #edit-panel {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      padding: 28px 20px 40px;
+      z-index: 150;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
+    }
+    #edit-panel.visible { display: block; }
+    #edit-panel h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    .edit-row { margin-bottom: 14px; }
+    .edit-row label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    .edit-row input, .edit-row textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+    .edit-row input:focus, .edit-row textarea:focus { border-color: var(--accent); }
+    .links-edit { display: flex; flex-direction: column; gap: 8px; }
+    .link-edit-row { display: flex; gap: 8px; align-items: center; }
+    .link-edit-row input { flex: 1; }
+    .link-edit-row button {
+      background: none; border: none;
+      color: #ff6b6b; font-size: 18px;
+      cursor: pointer; flex-shrink: 0;
+      line-height: 1;
+    }
+    .add-link-btn {
+      background: var(--accent-dim);
+      border: 1px dashed var(--accent);
+      color: var(--accent);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+    .edit-footer { display: flex; gap: 10px; margin-top: 20px; }
+    .edit-footer .btn { flex: 1; padding: 12px; }
+
+    /* ── Login trigger ── */
+    #login-trigger {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      transition: color 0.2s, border-color 0.2s;
+      z-index: 50;
+    }
+    #login-trigger:hover { color: var(--accent); border-color: var(--accent); }
+    body.admin-mode #login-trigger { display: none; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--accent);
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 480px) {
+      .profile-header { gap: 18px; }
+      .avatar-ring { width: 76px; height: 76px; }
+      .display-name { font-size: 22px; }
+      .photo-grid { gap: 2px; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="/" class="back-link">← Home</a>
+
+<div id="admin-bar">
+  <span class="admin-label">✦ Edit Mode</span>
+  <div class="admin-actions">
+    <button class="btn btn-accent" onclick="openEditPanel()">Edit Profile</button>
+    <button class="btn btn-danger" onclick="logOut()">Sign out</button>
+  </div>
+</div>
+
+<div id="login-modal">
+  <div class="modal-card">
+    <h2>Admin Login</h2>
+    <div class="field">
+      <label>EMAIL</label>
+      <input type="email" id="login-email" placeholder="you@email.com" />
+    </div>
+    <div class="field">
+      <label>PASSWORD</label>
+      <input type="password" id="login-password" placeholder="••••••••" />
+    </div>
+    <div id="login-error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeLogin()">Cancel</button>
+      <button class="btn btn-accent" onclick="doLogin()">Sign in</button>
+    </div>
+  </div>
+</div>
+
+<div class="profile-wrap">
+
+  <div class="profile-header">
+    <div class="avatar-wrap">
+      <div class="avatar-ring">
+        <img id="avatar-img" class="avatar-img" src="" alt="Profile photo" />
+      </div>
+      <div class="avatar-edit-btn" onclick="document.getElementById('avatar-input').click()" title="Change photo">✎</div>
+      <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="uploadAvatar(this)" />
+    </div>
+    <div class="profile-info">
+      <div class="display-name" id="display-name">—</div>
+      <div class="username" id="username">@—</div>
+      <div class="bio" id="bio"></div>
+    </div>
+  </div>
+
+  <div class="links-section" id="links-section"></div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num" id="stat-posts">0</div>
+      <div class="stat-label">Posts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-year">—</div>
+      <div class="stat-label">Since</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-views">—</div>
+      <div class="stat-label">Views</div>
+    </div>
+  </div>
+
+  <div class="section-label">Posts</div>
+  <div class="photo-grid" id="photo-grid">
+    <div class="grid-cell grid-cell-add" onclick="document.getElementById('photo-input').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Add</span>
+    </div>
+  </div>
+  <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="uploadPhotos(this)" />
+
+</div>
+
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<div id="edit-panel">
+  <h3>Edit Profile</h3>
+  <div class="edit-row">
+    <label>DISPLAY NAME</label>
+    <input type="text" id="edit-name" placeholder="Your Name" />
+  </div>
+  <div class="edit-row">
+    <label>USERNAME</label>
+    <input type="text" id="edit-username" placeholder="yourhandle" />
+  </div>
+  <div class="edit-row">
+    <label>BIO</label>
+    <textarea id="edit-bio" rows="3" placeholder="Tell the world who you are..."></textarea>
+  </div>
+  <div class="edit-row">
+    <label>LINKS</label>
+    <div class="links-edit" id="links-edit"></div>
+    <button class="add-link-btn" onclick="addLinkField()">+ Add link</button>
+  </div>
+  <div class="edit-row">
+    <label>YEAR JOINED (e.g. 2024)</label>
+    <input type="text" id="edit-year" placeholder="2024" maxlength="4" />
+  </div>
+  <div class="edit-footer">
+    <button class="btn btn-ghost" onclick="closeEditPanel()">Cancel</button>
+    <button class="btn btn-accent" onclick="saveProfile()">Save</button>
+  </div>
+</div>
+
+<div id="login-trigger" onclick="openLogin()" title="Admin login">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+  </svg>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  // ─── YOUR SUPABASE CONFIG ───────────────────────────────────────
+  const SUPABASE_URL = "https://bteojuybqkeldofcqvda.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0ZW9qdXlicWtlbGRvZmNxdmRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NjQ0NDAsImV4cCI6MjA5ODM0MDQ0MH0.LNfWUbyA01gocxvvWogbkYIDYsdFQ5OMcEAjEd8SNMg";
+  // ─────────────────────────────────────────────────────────────────
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let profileData = {
+    id: null,
+    name: "Hamiz",
+    username: "hamiz",
+    bio: "",
+    links: [],
+    avatar_url: "",
+    year: new Date().getFullYear().toString(),
+    photos: []
+  };
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  function closeLogin() {
+    document.getElementById('login-modal').classList.remove('visible');
+    document.getElementById('login-error').textContent = '';
+  }
+  window.closeLogin = closeLogin;
+
+  function openLogin() {
+    document.getElementById('login-modal').classList.add('visible');
+  }
+  window.openLogin = openLogin;
+
+  // ─── Auth ──────────────────────────────────────────────────────
+  window.doLogin = async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    document.getElementById('login-error').textContent = '';
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      document.getElementById('login-error').textContent = 'Wrong email or password.';
+      return;
+    }
+    closeLogin();
+    toast('Welcome back ✦');
+  };
+
+  window.logOut = async () => {
+    await supabase.auth.signOut();
+    document.body.classList.remove('admin-mode');
+    document.getElementById('admin-bar').classList.remove('visible');
+    toast('Signed out');
+  };
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      document.body.classList.add('admin-mode');
+      document.getElementById('admin-bar').classList.add('visible');
+    } else {
+      document.body.classList.remove('admin-mode');
+      document.getElementById('admin-bar').classList.remove('visible');
+    }
+  });
+
+  // ─── Load profile ──────────────────────────────────────────────
+  async function loadProfile() {
+    const { data, error } = await supabase.from('profile').select('*').limit(1).single();
+    if (data) {
+      profileData = { ...profileData, ...data };
+    }
+    renderProfile();
+  }
+
+  function renderProfile() {
+    const d = profileData;
+    document.getElementById('display-name').textContent = d.name || '—';
+    document.getElementById('username').textContent = '@' + (d.username || '—');
+    document.getElementById('bio').textContent = d.bio || '';
+    document.title = d.name || 'Profile';
+
+    const avatarEl = document.getElementById('avatar-img');
+    avatarEl.src = d.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name)}&background=1e1e1e&color=c8f135&size=200`;
+
+    const linksEl = document.getElementById('links-section');
+    linksEl.innerHTML = '';
+    (d.links || []).forEach(link => {
+      if (!link.url) return;
+      const a = document.createElement('a');
+      a.href = link.url.startsWith('http') ? link.url : 'https://' + link.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'link-chip';
+      a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>${link.label || link.url}`;
+      linksEl.appendChild(a);
+    });
+
+    const photos = d.photos || [];
+    document.getElementById('stat-posts').textContent = photos.length;
+    document.getElementById('stat-year').textContent = d.year || '—';
+    document.getElementById('stat-views').textContent = '—';
+
+    renderGrid(photos);
+  }
+
+  function renderGrid(photos) {
+    const grid = document.getElementById('photo-grid');
+    const addCell = grid.querySelector('.grid-cell-add');
+    grid.innerHTML = '';
+    grid.appendChild(addCell);
+
+    photos.forEach((photo, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      cell.innerHTML = `
+        <img src="${photo.url}" loading="lazy" alt="Photo ${i+1}" />
+        <button class="grid-cell-del" onclick="deletePhoto(${i}, event)" title="Delete">×</button>
+      `;
+      cell.querySelector('img').addEventListener('click', () => openLightbox(photo.url));
+      grid.insertBefore(cell, addCell);
+    });
+  }
+
+  // ─── Edit panel ────────────────────────────────────────────────
+  window.openEditPanel = () => {
+    const d = profileData;
+    document.getElementById('edit-name').value = d.name || '';
+    document.getElementById('edit-username').value = d.username || '';
+    document.getElementById('edit-bio').value = d.bio || '';
+    document.getElementById('edit-year').value = d.year || '';
+
+    const linksEdit = document.getElementById('links-edit');
+    linksEdit.innerHTML = '';
+    (d.links || []).forEach(l => addLinkField(l.label, l.url));
+
+    document.getElementById('edit-panel').classList.add('visible');
+  };
+
+  window.closeEditPanel = () => {
+    document.getElementById('edit-panel').classList.remove('visible');
+  };
+
+  window.addLinkField = (label = '', url = '') => {
+    const linksEdit = document.getElementById('links-edit');
+    const row = document.createElement('div');
+    row.className = 'link-edit-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Label (e.g. Twitter)" value="${label}" class="link-label" />
+      <input type="url" placeholder="https://..." value="${url}" class="link-url" />
+      <button onclick="this.parentElement.remove()" title="Remove">×</button>
+    `;
+    linksEdit.appendChild(row);
+  };
+
+  async function persistProfile() {
+    const { error } = await supabase
+      .from('profile')
+      .update(profileData)
+      .eq('id', profileData.id);
+    if (error) {
+      toast('Save failed — check console');
+      console.error(error);
+      return false;
+    }
+    return true;
+  }
+
+  window.saveProfile = async () => {
+    const linkRows = document.querySelectorAll('.link-edit-row');
+    const links = Array.from(linkRows).map(r => ({
+      label: r.querySelector('.link-label').value.trim(),
+      url:   r.querySelector('.link-url').value.trim()
+    })).filter(l => l.url);
+
+    profileData.name     = document.getElementById('edit-name').value.trim();
+    profileData.username = document.getElementById('edit-username').value.trim().replace('@','');
+    profileData.bio      = document.getElementById('edit-bio').value.trim();
+    profileData.year     = document.getElementById('edit-year').value.trim();
+    profileData.links    = links;
+
+    const ok = await persistProfile();
+    if (ok) {
+      renderProfile();
+      closeEditPanel();
+      toast('Profile saved ✦');
+    }
+  };
+
+  // ─── Avatar upload ─────────────────────────────────────────────
+  window.uploadAvatar = async (input) => {
+    const file = input.files[0];
+    if (!file) return;
+    toast('Uploading...');
+    const path = `avatar_${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const { error: upErr } = await supabase.storage.from('photos').upload(path, file, { upsert: true });
+    if (upErr) { toast('Upload failed'); console.error(upErr); return; }
+    const { data } = supabase.storage.from('photos').getPublicUrl(path);
+    profileData.avatar_url = data.publicUrl;
+    const ok = await persistProfile();
+    if (ok) { renderProfile(); toast('Avatar updated ✦'); }
+  };
+
+  // ─── Photo grid ────────────────────────────────────────────────
+  window.uploadPhotos = async (input) => {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    toast(`Uploading ${files.length} photo${files.length > 1 ? 's' : ''}...`);
+
+    for (const file of files) {
+      const path = `${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+      const { error: upErr } = await supabase.storage.from('photos').upload(path, file);
+      if (upErr) { console.error(upErr); continue; }
+      const { data } = supabase.storage.from('photos').getPublicUrl(path);
+      profileData.photos = [...(profileData.photos || []), { url: data.publicUrl, storagePath: path }];
+    }
+
+    const ok = await persistProfile();
+    if (ok) { renderProfile(); toast('Photos uploaded ✦'); }
+    input.value = '';
+  };
+
+  window.deletePhoto = async (index, e) => {
+    e.stopPropagation();
+    if (!confirm('Delete this photo?')) return;
+    const photo = profileData.photos[index];
+    try {
+      await supabase.storage.from('photos').remove([photo.storagePath]);
+    } catch (_) {}
+    profileData.photos.splice(index, 1);
+    const ok = await persistProfile();
+    if (ok) { renderProfile(); toast('Photo removed'); }
+  };
+
+  // ─── Lightbox ──────────────────────────────────────────────────
+  window.openLightbox = (url) => {
+    document.getElementById('lightbox-img').src = url;
+    document.getElementById('lightbox').classList.add('visible');
+  };
+  window.closeLightbox = () => {
+    document.getElementById('lightbox').classList.remove('visible');
+  };
+
+  loadProfile();
+</script>
+
+</body>
+</html>
